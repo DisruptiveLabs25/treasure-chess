@@ -73,7 +73,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const TCT_TO_USD_RATE = 0.04; // 1 TCT = $0.04 (25 TCT = $1)
 const USDC_TO_TCT = 25; // 1 USDC = 25 TCT
 const MIN_WITHDRAWAL_TCT = 250;   // Flat $10 minimum across all methods
-const WITHDRAWAL_FEE_PERCENT = 6.5; // 6.5% total (5% platform + 1.5% Stripe instant payout)
+const WITHDRAWAL_FEE_PERCENT = 6.5; // 6.5% total (5% platform + 1.5% processing fee)
 
 type WithdrawalMethod = "base" | "bridge" | "bank";
 type WithdrawalStep =
@@ -266,7 +266,7 @@ export default function WithdrawScreen() {
   const [destinationChain, setDestinationChain] = useState<ChainDefinition | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isStripeLoading, setIsStripeLoading] = useState(false);
+  const [isMoonPayLoading, setIsMoonPayLoading] = useState(false);
   const [pendingWithdrawalsList, setPendingWithdrawalsList] = useState<PendingWithdrawal[]>([]);
   const [withdrawalResult, setWithdrawalResult] = useState<{
     success: boolean;
@@ -405,7 +405,7 @@ export default function WithdrawScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     if (method === "bank") {
-      setStep("confirm"); // Stripe Connect — no bank-details step needed
+      setStep("confirm");
     } else {
       setStep("address");
     }
@@ -760,7 +760,7 @@ export default function WithdrawScreen() {
         if (method === "base") {
           setStep("address");
         } else if (method === "bank") {
-          setStep("amount"); // Stripe Connect — bank-details step is skipped
+          setStep("amount");
         } else {
           setStep("address");
         }
@@ -774,62 +774,40 @@ export default function WithdrawScreen() {
     }
   }, [step, method, router]);
 
-  // Open Stripe Connect onboarding (first-time) or go straight to amount step
-  const handleStripeWithdraw = useCallback(async () => {
-    const connectAccountId = profile?.stripeConnectAccountId;
-
-    if (!connectAccountId) {
-      setIsStripeLoading(true);
-      try {
-        const { data, error: invokeError } = await supabase.functions.invoke("stripe-connect-onboard", {
-          body: { return_url: "treasurechess://withdraw" },
-        });
-        if (invokeError) throw new Error(invokeError.message ?? "Failed to start onboarding");
-        if (data?.error) throw new Error(data.error);
-
-        await WebBrowser.openAuthSessionAsync(data.onboarding_url, "treasurechess://");
-        // Re-fetch full profile so stripe_connect_account_id lands in the store
-        if (profile?.authUserId) await fetchProfile(profile.authUserId);
-      } catch (err: any) {
-        Alert.alert("Setup Error", err.message ?? "Failed to set up payout account. Please try again.");
-        return;
-      } finally {
-        setIsStripeLoading(false);
-      }
-    }
-
+  // Go directly to the amount step — no server-side account setup needed with MoonPay
+  const handleMoonPaySelectStep = useCallback(() => {
     setMethod("bank");
     setAmountRaw(Math.min(MIN_WITHDRAWAL_TCT, availableBalance));
     setAmountText(String(Math.min(MIN_WITHDRAWAL_TCT, availableBalance)));
     setStep("amount");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  }, [profile, availableBalance, refreshBalance, fetchProfile]);
+  }, [availableBalance]);
 
-  // Execute the Stripe Connect payout
-  const handleStripePayout = useCallback(async () => {
-    if (amount < MIN_WITHDRAWAL_TCT) return;
+  // Open MoonPay sell widget so user can cash out their USDC
+  const handleMoonPayWithdraw = useCallback(async () => {
+    const userWalletAddress = cryptoAddress;
+    if (!userWalletAddress) {
+      Alert.alert("No Wallet", "No wallet address found. Please set up your wallet first.");
+      return;
+    }
 
-    setIsStripeLoading(true);
+    setIsMoonPayLoading(true);
     try {
-      const { data, error: invokeError } = await supabase.functions.invoke("stripe-payout", {
-        body: { amount_tct: amount },
+      const { data, error: invokeError } = await supabase.functions.invoke("generate-moonpay-url", {
+        body: { flow: "sell", currencyCode: "usdc", walletAddress: userWalletAddress },
       });
-      if (invokeError) throw new Error(invokeError.message ?? "Payout failed");
+      if (invokeError) throw new Error(invokeError.message ?? "Failed to generate payment URL");
       if (data?.error) throw new Error(data.error);
 
+      await WebBrowser.openBrowserAsync(data.url);
       await refreshBalance();
-      setWithdrawalResult({
-        success: true,
-        message: `$${data.amount_usd.toFixed(2)} is on its way to your debit card — should arrive within ~30 minutes.`,
-      });
-      setStep("complete");
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      if (profile?.id) await refreshTransactions(profile.id);
     } catch (err: any) {
       Alert.alert("Withdrawal Error", err.message ?? "Something went wrong. Please try again.");
     } finally {
-      setIsStripeLoading(false);
+      setIsMoonPayLoading(false);
     }
-  }, [amount, refreshBalance]);
+  }, [cryptoAddress, profile?.id, refreshBalance, refreshTransactions]);
 
   const handleDone = useCallback(() => {
     router.back();
@@ -840,7 +818,6 @@ export default function WithdrawScreen() {
   // ============================================================================
 
   const renderSelectStep = () => {
-    const hasConnectAccount = !!profile?.stripeConnectAccountId;
     const insufficientBalance = availableBalance < MIN_WITHDRAWAL_TCT;
 
     return (
@@ -851,12 +828,12 @@ export default function WithdrawScreen() {
         <View style={styles.methodsContainer}>
           <MethodCard
             title="Instant Debit Card"
-            subtitle={hasConnectAccount ? "Powered by Stripe · Account connected" : "Powered by Stripe · One-time setup required"}
+            subtitle="Powered by MoonPay · Sell USDC for fiat"
             icon={Building2}
             gradientColors={["#635BFF", "#4B44CC"]}
-            onPress={handleStripeWithdraw}
+            onPress={handleMoonPaySelectStep}
             badge="~30 min"
-            disabled={insufficientBalance || isStripeLoading}
+            disabled={insufficientBalance || isMoonPayLoading}
           />
         </View>
 
@@ -881,7 +858,7 @@ export default function WithdrawScreen() {
         <View style={styles.infoBox}>
           <Info size={16} color="#A0A0A0" />
           <Text style={styles.infoText}>
-            6.5% fee on withdrawals (includes Stripe instant payout). Minimum {formatTCT(MIN_WITHDRAWAL_TCT)} TCT (${formatUSD(tctToUsd(MIN_WITHDRAWAL_TCT))}). Funds arrive to your debit card in ~30 minutes.
+            6.5% fee on withdrawals. Minimum {formatTCT(MIN_WITHDRAWAL_TCT)} TCT (${formatUSD(tctToUsd(MIN_WITHDRAWAL_TCT))}). Funds arrive to your debit card in ~30 minutes.
           </Text>
         </View>
       </View>
@@ -1416,7 +1393,7 @@ export default function WithdrawScreen() {
                 </View>
                 <View style={styles.confirmRow}>
                   <Text style={styles.confirmLabel}>Via</Text>
-                  <Text style={styles.confirmValue}>Stripe Instant Payout</Text>
+                  <Text style={styles.confirmValue}>MoonPay Offramp</Text>
                 </View>
                 <View style={styles.confirmRow}>
                   <Text style={styles.confirmLabel}>Arrives</Text>
@@ -1437,7 +1414,7 @@ export default function WithdrawScreen() {
             <Shield size={16} color={iconColor} />
             <Text style={[styles.signatureNoteText, { color: iconColor }]}>
               {isBank
-                ? "Processed securely via Stripe Connect. Funds sent directly to your verified bank account."
+                ? "Processed via MoonPay. Opens MoonPay to sell USDC for fiat."
                 : "Your TCT is locked and USDC will be sent from the platform vault to your address."}
             </Text>
           </View>
@@ -1453,9 +1430,9 @@ export default function WithdrawScreen() {
         )}
 
         <TouchableOpacity
-          style={[styles.continueButton, (isLoading || isStripeLoading) && styles.continueButtonDisabled]}
-          onPress={isBank ? handleStripePayout : handleConfirmSubmit}
-          disabled={isLoading || isStripeLoading}
+          style={[styles.continueButton, (isLoading || isMoonPayLoading) && styles.continueButtonDisabled]}
+          onPress={isBank ? handleMoonPayWithdraw : handleConfirmSubmit}
+          disabled={isLoading || isMoonPayLoading}
         >
           <LinearGradient
             colors={isBank ? ["#635BFF", "#4B44CC"] : (!isLoading ? ["#FFD700", "#FFA500"] : ["#444", "#333"])}
@@ -1463,7 +1440,7 @@ export default function WithdrawScreen() {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
           >
-            {isStripeLoading || isLoading ? (
+            {isMoonPayLoading || isLoading ? (
               <>
                 <ActivityIndicator size="small" color="#FFFFFF" />
                 <Text style={styles.continueButtonText}>Processing...</Text>

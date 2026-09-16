@@ -184,6 +184,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const isInitialized = useRef(false);
   const profileSyncInProgress = useRef(false);
+  // Tracks whether INITIAL_SESSION has fired. On cold start, SIGNED_IN fires
+  // first with an incomplete connection; we skip it and let INITIAL_SESSION
+  // (which fires serially after) handle the profile fetch correctly.
+  const initialSessionFired = useRef(false);
 
   // --------------------------------------------------------------------------
   // Profile helpers
@@ -196,8 +200,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         .from("profiles")
         .select("*")
         .eq("auth_user_id", authUserId)
-        .single();
-      if (error && error.code !== "PGRST116") {
+        .maybeSingle();
+      if (error) {
         logger.error("Auth", "Error fetching profile", { error: error.message });
       }
       return data ?? null;
@@ -319,7 +323,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (profileSyncInProgress.current) return;
     profileSyncInProgress.current = true;
 
-    const PROFILE_FETCH_TIMEOUT_MS = 8000;
+    const PROFILE_FETCH_TIMEOUT_MS = 15000;
     const PROFILE_FETCH_MAX_ATTEMPTS = 2;
 
     const withTimeout = <T,>(promise: Promise<T>, ms: number): Promise<T> =>
@@ -339,10 +343,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // the user to Guest mode.
       let profile: Profile | null = null;
       for (let attempt = 1; attempt <= PROFILE_FETCH_MAX_ATTEMPTS; attempt++) {
+        const t0 = Date.now();
         try {
+          console.log(`[Auth] Profile fetch attempt ${attempt}/${PROFILE_FETCH_MAX_ATTEMPTS} starting — auth user: ${authUserId}`);
           profile = await withTimeout(fetchProfileByAuthId(authUserId), PROFILE_FETCH_TIMEOUT_MS);
+          console.log(`[Auth] Profile fetch returned in ${Date.now() - t0}ms — ${profile ? `found profile ${profile.id}` : "no profile row (will create)"}`);
           break;
         } catch (e) {
+          console.log(`[Auth] Profile fetch attempt ${attempt} failed after ${Date.now() - t0}ms: ${String(e)}`);
           if (attempt === PROFILE_FETCH_MAX_ATTEMPTS) throw e;
           logger.warn("Auth", `Profile fetch attempt ${attempt} timed out, retrying`, { error: String(e) });
         }
@@ -472,7 +480,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       logger.debug("Auth", "Auth state changed", { event, hasSession: !!session });
 
       if (event === "SIGNED_IN" && session) {
-        await handleSession(session);
+        if (initialSessionFired.current) {
+          // Post-login SIGNED_IN (OTP verified, OAuth callback) — run immediately.
+          await handleSession(session);
+        } else {
+          // Cold-start SIGNED_IN fires before INITIAL_SESSION with an incomplete
+          // connection. Skip it — INITIAL_SESSION will handle the fetch correctly.
+          logger.debug("Auth", "Skipping SIGNED_IN before INITIAL_SESSION (cold start)");
+        }
       } else if (event === "SIGNED_OUT") {
         setState({
           ...initialState,
@@ -485,6 +500,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } else if (event === "TOKEN_REFRESHED") {
         logger.debug("Auth", "Token refreshed");
       } else if (event === "INITIAL_SESSION") {
+        initialSessionFired.current = true;
         if (session) {
           await handleSession(session);
         } else {

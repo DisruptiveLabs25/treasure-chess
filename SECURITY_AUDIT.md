@@ -1013,7 +1013,7 @@ The idempotency key `withdraw_${profile.id}_${Date.now()}` could theoretically g
 
 **Date:** 2026-06-01  
 **Scope:** Business logic attack scenarios targeting fund-draining paths that survived previous security fixes  
-**Auditor:** Automated red-team agent (claude-sonnet-4-6)
+**Auditor:** Automated red-team agent
 
 ---
 

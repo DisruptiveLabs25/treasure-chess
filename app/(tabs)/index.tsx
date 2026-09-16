@@ -1,6 +1,5 @@
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { DEV_BYPASS_AUTH } from "@/constants/devFlags";
-import { useFocusEffect } from "@react-navigation/native";
 import {
   Swords,
   Target,

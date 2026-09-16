@@ -23,7 +23,7 @@ Whenever you make a change in your local code editor and push it to GitHub, it w
 
 If you want to work locally using your own code editor, you can clone this repo and push changes. Pushed changes will also be reflected in Rork.
 
-If you are new to coding and unsure which editor to use, we recommend Cursor. If you're familiar with terminals, try Claude Code.
+If you are new to coding and unsure which editor to use, we recommend Cursor.
 
 The only requirement is having Node.js & Bun installed - [install Node.js with nvm](https://github.com/nvm-sh/nvm) and [install Bun](https://bun.sh/docs/installation)
 

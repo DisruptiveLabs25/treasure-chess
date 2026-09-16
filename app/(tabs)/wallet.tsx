@@ -737,7 +737,7 @@ function WalletContent() {
               </TouchableOpacity>
             </View>
 
-            {/* Card / Apple Pay — Stripe */}
+            {/* Card / Apple Pay — MoonPay */}
             <TouchableOpacity
               style={styles.methodRow}
               onPress={() => {
@@ -752,7 +752,7 @@ function WalletContent() {
               <View style={styles.methodInfo}>
                 <Text style={styles.methodTitle}>Card / Apple Pay</Text>
                 <Text style={styles.methodSub}>
-                  Visa, Mastercard, Apple Pay · Powered by Stripe
+                  USDC on-ramp · Powered by MoonPay
                 </Text>
               </View>
             </TouchableOpacity>

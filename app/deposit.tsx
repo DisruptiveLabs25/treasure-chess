@@ -315,7 +315,7 @@ export default function DepositScreen() {
   const [fiatDepositRequests, setFiatDepositRequests] = useState<FiatDepositRequest[]>([]);
   const [referenceCopied, setReferenceCopied] = useState(false);
   const [isSubmittingFiat, setIsSubmittingFiat] = useState(false);
-  const [isStripeLoading, setIsStripeLoading] = useState(false);
+  const [isMoonPayLoading, setIsMoonPayLoading] = useState(false);
 
   // Fiat ramp state
   const [showFiatRampCheckout, setShowFiatRampCheckout] = useState(false);
@@ -390,64 +390,32 @@ export default function DepositScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   }, [amount, authProfile?.id]);
 
-  // Stripe card payment — creates a Checkout Session and opens it in-browser
-  const handleStripeCheckout = useCallback(async (amountUsd: number) => {
-    if (!authProfile?.id) {
-      Alert.alert("Error", "You must be logged in to deposit");
-      return;
-    }
-    if (amountUsd < 1) {
-      Alert.alert("Invalid Amount", "Minimum deposit is $1");
+  // MoonPay card payment — generates a signed widget URL and opens it in-browser
+  const handleMoonPayCheckout = useCallback(async () => {
+    const userWalletAddress = profile?.embeddedWalletAddress || walletAddress;
+    if (!userWalletAddress) {
+      Alert.alert("No Wallet", "No wallet address found. Please set up your wallet first.");
       return;
     }
 
-    setIsStripeLoading(true);
+    setIsMoonPayLoading(true);
     try {
-      const { data, error: invokeError } = await supabase.functions.invoke("stripe-create-checkout", {
-        body: { amount_usd: amountUsd },
+      const { data, error: invokeError } = await supabase.functions.invoke("generate-moonpay-url", {
+        body: { flow: "buy", currencyCode: "usdc", walletAddress: userWalletAddress },
       });
-      if (invokeError) throw new Error(invokeError.message ?? "Failed to create checkout session");
+      if (invokeError) throw new Error(invokeError.message ?? "Failed to generate payment URL");
       if (data?.error) throw new Error(data.error);
 
-      const { checkout_url } = data;
-
-      // Open Stripe's hosted checkout in an in-app browser
-      const result = await WebBrowser.openAuthSessionAsync(checkout_url, "treasurechess://");
-
-      if (result.type === "success") {
-        const url = new URL((result as any).url);
-        const stripeStatus = url.searchParams.get("stripe_status");
-
-        if (stripeStatus === "success") {
-          await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          // Poll for balance update — webhook fires async so give it up to 10s
-          const expectedTct = usdToTct(amountUsd);
-          const balanceBefore = profile?.availableTct ?? 0;
-          let credited = false;
-          for (let i = 0; i < 5; i++) {
-            await new Promise((r) => setTimeout(r, 2000));
-            await refreshBalance();
-            const balanceNow = useUserStore.getState().profile?.availableTct ?? 0;
-            if (balanceNow >= balanceBefore + expectedTct) { credited = true; break; }
-          }
-          if (profile?.id) await refreshTransactions(profile.id);
-          Alert.alert(
-            "Payment Successful!",
-            credited
-              ? `${expectedTct.toLocaleString()} TCT has been added to your balance.`
-              : `Payment received! Your ${expectedTct.toLocaleString()} TCT balance will update shortly.`,
-            [{ text: "Great!", onPress: () => { setStep("select"); setAmount(""); setSelectedPreset(null); } }]
-          );
-        }
-        // stripe_status === "cancel" → user cancelled, stay on amount step
-      }
+      await WebBrowser.openBrowserAsync(data.url);
+      await refreshBalance();
+      if (profile?.id) await refreshTransactions(profile.id);
     } catch (err: any) {
-      console.error("[Stripe] Checkout error:", err);
+      console.error("[MoonPay] Checkout error:", err);
       Alert.alert("Payment Error", err.message ?? "Something went wrong. Please try again.");
     } finally {
-      setIsStripeLoading(false);
+      setIsMoonPayLoading(false);
     }
-  }, [authProfile?.id, profile?.id, refreshBalance, refreshTransactions]);
+  }, [profile?.embeddedWalletAddress, profile?.id, walletAddress, refreshBalance, refreshTransactions]);
 
   // Submit fiat deposit request to DB and open Revolut
   const handleSubmitFiatDeposit = useCallback(async () => {
@@ -703,11 +671,11 @@ export default function DepositScreen() {
               </View>
             )}
 
-            {/* Stripe security badge */}
+            {/* MoonPay security badge */}
             <View style={styles.providerInfo}>
               <Shield size={16} color="#635BFF" />
               <Text style={styles.providerInfoText}>
-                Secure payment via Stripe
+                Secure payment via MoonPay
               </Text>
             </View>
 
@@ -724,8 +692,8 @@ export default function DepositScreen() {
                 styles.continueButton,
                 !isValidAmount && styles.continueButtonDisabled,
               ]}
-              onPress={() => handleStripeCheckout(numAmount)}
-              disabled={!isValidAmount || isStripeLoading}
+              onPress={handleMoonPayCheckout}
+              disabled={!isValidAmount || isMoonPayLoading}
             >
               <LinearGradient
                 colors={isValidAmount ? ["#635BFF", "#4B44CC"] : ["#444", "#333"]}
@@ -733,7 +701,7 @@ export default function DepositScreen() {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               >
-                {isStripeLoading ? (
+                {isMoonPayLoading ? (
                   <ActivityIndicator size="small" color="#FFFFFF" />
                 ) : (
                   <>
@@ -748,7 +716,7 @@ export default function DepositScreen() {
 
             {/* Payment methods badge */}
             <View style={styles.paymentMethods}>
-              <Text style={styles.paymentMethodsLabel}>Powered by Stripe · Accepts:</Text>
+              <Text style={styles.paymentMethodsLabel}>Powered by MoonPay · Accepts:</Text>
               <Text style={styles.paymentMethodsText}>
                 Visa, Mastercard, Apple Pay, Google Pay
               </Text>

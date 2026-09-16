@@ -109,7 +109,11 @@
             "./assets/sounds/notification.wav"
           ]
         }
-      ]
+      ],
+      "expo-image",
+      "expo-secure-store",
+      "expo-splash-screen",
+      "expo-status-bar"
     ],
     "experiments": {
       "typedRoutes": true
