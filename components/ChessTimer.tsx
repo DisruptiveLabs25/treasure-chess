@@ -7,7 +7,7 @@ import {
   AppState,
   AppStateStatus,
 } from "react-native";
-import { Audio } from "expo-av";
+import { createAudioPlayer, AudioPlayer } from "expo-audio";
 
 export interface TimeControl {
   initial: number; // seconds
@@ -73,7 +73,7 @@ export const ChessTimer = memo(function ChessTimer({
   const [hasPlayedLowTimeSound, setHasPlayedLowTimeSound] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastTickRef = useRef<number>(Date.now());
-  const soundRef = useRef<Audio.Sound | null>(null);
+  const soundRef = useRef<AudioPlayer | null>(null);
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
   const pausedTimeRef = useRef<number | null>(null);
 
@@ -91,26 +91,17 @@ export const ChessTimer = memo(function ChessTimer({
 
   // Load low time sound
   useEffect(() => {
-    const loadSound = async () => {
-      if (!enableLowTimeSound) return;
+    if (!enableLowTimeSound) return;
 
-      try {
-        const { sound } = await Audio.Sound.createAsync(
-          require("@/assets/sounds/clock.mp3"),
-          { shouldPlay: false }
-        );
-        soundRef.current = sound;
-      } catch (e) {
-        // Sound file might not exist, continue without it
-        console.log("Low time sound not available");
-      }
-    };
-
-    loadSound();
+    try {
+      soundRef.current = createAudioPlayer(require("@/assets/sounds/clock.mp3"));
+    } catch (e) {
+      console.log("Low time sound not available");
+    }
 
     return () => {
       if (soundRef.current) {
-        soundRef.current.unloadAsync();
+        soundRef.current.remove();
       }
     };
   }, [enableLowTimeSound]);
@@ -194,8 +185,8 @@ export const ChessTimer = memo(function ChessTimer({
         !hasPlayedLowTimeSound
       ) {
         try {
-          await soundRef.current.setPositionAsync(0);
-          await soundRef.current.playAsync();
+          await soundRef.current.seekTo(0);
+          soundRef.current.play();
           setHasPlayedLowTimeSound(true);
         } catch (e) {
           // Ignore sound errors

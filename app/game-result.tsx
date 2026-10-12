@@ -27,7 +27,7 @@ import { LottieSpinner } from "@/components/LottieSpinner";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { Audio } from "expo-av";
+import { createAudioPlayer, AudioPlayer } from "expo-audio";
 import { fetchGameResult, fetchGamePGN } from "@/lib/gameSession";
 import {
   formatRatingChange,
@@ -92,7 +92,7 @@ export default function GameResultScreen() {
   const [pgn, setPgn] = useState<string | null>(null);
   const [showPgn, setShowPgn] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
-  const soundRef = useRef<Audio.Sound | null>(null);
+  const soundRef = useRef<AudioPlayer | null>(null);
 
   // Determine which player we are — use param, fall back to auth profile
   const playerId = params.playerId || profile?.id;
@@ -108,17 +108,17 @@ export default function GameResultScreen() {
     : "loss";
 
   // Play result sound effect
-  const playResultSound = async (result: string) => {
+  const playResultSound = (result: string) => {
     try {
-      // Unload previous sound if exists
       if (soundRef.current) {
-        await soundRef.current.unloadAsync();
+        soundRef.current.remove();
+        soundRef.current = null;
       }
 
       const soundFile = result === "win" ? SOUNDS.win : SOUNDS.lose;
-      const { sound } = await Audio.Sound.createAsync(soundFile);
-      soundRef.current = sound;
-      await sound.playAsync();
+      const player = createAudioPlayer(soundFile);
+      soundRef.current = player;
+      player.play();
     } catch (error) {
       console.error("Error playing sound:", error);
     }
@@ -128,7 +128,7 @@ export default function GameResultScreen() {
   useEffect(() => {
     return () => {
       if (soundRef.current) {
-        soundRef.current.unloadAsync();
+        soundRef.current.remove();
       }
     };
   }, []);

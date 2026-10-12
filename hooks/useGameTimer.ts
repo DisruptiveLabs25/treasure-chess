@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { AppState, AppStateStatus } from "react-native";
-import { Audio } from "expo-av";
+import { createAudioPlayer, AudioPlayer } from "expo-audio";
 
 export interface TimeControl {
   initial: number; // seconds
@@ -66,7 +66,7 @@ export function useGameTimer({
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastTickRef = useRef<number>(Date.now());
   const incrementMs = useRef(timeControl.increment * 1000);
-  const soundRef = useRef<Audio.Sound | null>(null);
+  const soundRef = useRef<AudioPlayer | null>(null);
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
   const pausedStateRef = useRef<{
     whiteMs: number;
@@ -81,13 +81,9 @@ export function useGameTimer({
 
   // Load low time sound
   useEffect(() => {
-    const loadSound = async () => {
+    const loadSound = () => {
       try {
-        const { sound } = await Audio.Sound.createAsync(
-          require("@/assets/sounds/clock.mp3"),
-          { shouldPlay: false }
-        );
-        soundRef.current = sound;
+        soundRef.current = createAudioPlayer(require("@/assets/sounds/clock.mp3"));
       } catch (e) {
         // Sound file might not exist
       }
@@ -97,7 +93,7 @@ export function useGameTimer({
 
     return () => {
       if (soundRef.current) {
-        soundRef.current.unloadAsync();
+        soundRef.current.remove();
       }
     };
   }, []);

@@ -14,7 +14,7 @@
 
 import { Platform } from "react-native";
 import { Camera, CameraView } from "expo-camera";
-import { Audio } from "expo-av";
+import { AudioRecorder, setAudioModeAsync, AudioQuality, IOSOutputFormat } from "expo-audio";
 import * as FileSystem from "expo-file-system";
 import { supabase } from "./supabase";
 import type {
@@ -53,7 +53,7 @@ export function createNativeRTMPPublisherImpl(callbacks: RTMPCallbacks): RTMPPub
   let viewRef: React.RefObject<any> | null = null;
 
   // Audio recording
-  let audioRecording: Audio.Recording | null = null;
+  let audioRecording: AudioRecorder | null = null;
 
   // Stream statistics
   let stats: StreamHealth = {
@@ -161,36 +161,34 @@ export function createNativeRTMPPublisherImpl(callbacks: RTMPCallbacks): RTMPPub
     if (!config?.enableMicrophone) return;
 
     try {
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-        staysActiveInBackground: true,
+      await setAudioModeAsync({
+        allowsRecording: true,
+        playsInSilentMode: true,
+        shouldPlayInBackground: true,
       });
 
-      const { recording } = await Audio.Recording.createAsync({
+      const recorder = new AudioRecorder({
+        extension: ".aac",
+        sampleRate: 44100,
+        numberOfChannels: 2,
+        bitRate: config.audioBitrate * 1000,
         android: {
-          extension: ".aac",
-          outputFormat: Audio.AndroidOutputFormat.AAC_ADTS,
-          audioEncoder: Audio.AndroidAudioEncoder.AAC,
-          sampleRate: 44100,
-          numberOfChannels: 2,
-          bitRate: config.audioBitrate * 1000,
+          outputFormat: "aac_adts",
+          audioEncoder: "aac",
         },
         ios: {
-          extension: ".aac",
-          outputFormat: Audio.IOSOutputFormat.MPEG4AAC,
-          audioQuality: Audio.IOSAudioQuality.HIGH,
-          sampleRate: 44100,
-          numberOfChannels: 2,
-          bitRate: config.audioBitrate * 1000,
+          outputFormat: IOSOutputFormat.MPEG4AAC,
+          audioQuality: AudioQuality.HIGH,
         },
         web: {
           mimeType: "audio/webm",
           bitsPerSecond: config.audioBitrate * 1000,
         },
       });
+      await recorder.prepareToRecordAsync();
+      recorder.record();
 
-      audioRecording = recording;
+      audioRecording = recorder;
     } catch (error) {
       console.error("Failed to start audio capture:", error);
       // Continue without audio rather than failing the entire stream
@@ -203,7 +201,7 @@ export function createNativeRTMPPublisherImpl(callbacks: RTMPCallbacks): RTMPPub
   const stopAudioCapture = async (): Promise<void> => {
     if (audioRecording) {
       try {
-        await audioRecording.stopAndUnloadAsync();
+        await audioRecording.stop();
       } catch (error) {
         console.error("Error stopping audio:", error);
       }

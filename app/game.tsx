@@ -1747,7 +1747,7 @@ Be friendly and constructive. Keep it brief and conversational.`;
                         onPress={() => handleSquarePress(rowIndex, colIndex)}
                       >
                         {square === illegalSquare && (
-                          <ReAnimated.View style={[StyleSheet.absoluteFillObject, styles.illegalOverlay, illegalStyle]} />
+                          <ReAnimated.View style={[StyleSheet.absoluteFill, styles.illegalOverlay, illegalStyle]} />
                         )}
                         {isPossibleMove && (
                           animEnabled ? (

@@ -4,4 +4,15 @@ android/
 ios/
 *.log
 .env
+.env.*
 .DS_Store
+.git/
+__tests__/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+coverage/
+scripts/
+.vscode/
+*.md

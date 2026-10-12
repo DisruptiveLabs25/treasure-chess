@@ -759,7 +759,7 @@ export default function HouseChallengeGameScreen() {
                   activeOpacity={0.8}
                 >
                   {square === illegalSquare && (
-                    <Animated.View style={[StyleSheet.absoluteFillObject, styles.illegalOverlay, illegalStyle]} />
+                    <Animated.View style={[StyleSheet.absoluteFill, styles.illegalOverlay, illegalStyle]} />
                   )}
                   {isPossibleMove && (
                     animEnabled ? (

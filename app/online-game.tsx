@@ -1308,7 +1308,7 @@ export default function OnlineGameScreen() {
                           onPress={() => handleSquarePressImpl(square)}
                         >
                           {square === illegalSquare && (
-                            <Animated.View style={[StyleSheet.absoluteFillObject, styles.illegalOverlay, illegalStyle]} />
+                            <Animated.View style={[StyleSheet.absoluteFill, styles.illegalOverlay, illegalStyle]} />
                           )}
                           {isPossibleMove && (
                             animEnabled ? (

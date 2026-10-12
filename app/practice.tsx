@@ -1045,7 +1045,7 @@ export default function PracticeScreen() {
                       onPress={() => handleSquarePress(rowIndex, colIndex)}
                     >
                       {square === illegalSquare && (
-                        <Animated.View style={[StyleSheet.absoluteFillObject, styles.illegalOverlay, illegalStyle]} />
+                        <Animated.View style={[StyleSheet.absoluteFill, styles.illegalOverlay, illegalStyle]} />
                       )}
                       {isPossibleMove && (
                         animEnabled ? (
