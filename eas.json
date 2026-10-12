@@ -57,14 +57,14 @@
   "submit": {
     "testflight": {
       "ios": {
-        "ascAppId": "681835111",
+        "ascAppId": "6818351111",
         "appleTeamId": "MU9893778V",
         "appleId": "kyllmaramgmt@gmail.com"
       }
     },
     "production": {
       "ios": {
-        "ascAppId": "681835111",
+        "ascAppId": "6818351111",
         "appleTeamId": "MU9893778V",
         "appleId": "kyllmaramgmt@gmail.com"
       }
