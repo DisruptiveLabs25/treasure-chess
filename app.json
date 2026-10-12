@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "High Stakes Chess",
-    "slug": "high-stakes-chess",
+    "name": "Treasure Chess",
+    "slug": "disruptivelabs",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -123,10 +123,10 @@
         "origin": "https://rork.com/"
       },
       "eas": {
-        "projectId": "b9455945-faeb-4c3b-93e8-fb72b4473f2d"
+        "projectId": "67da8058-748a-423c-8278-c6ff48ce4c8a"
       }
     },
-    "owner": "eneh4kene",
+    "owner": "kyllmara",
     "runtimeVersion": "1.0.0",
     "updates": {
       "enabled": false,

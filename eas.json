@@ -37,10 +37,10 @@
       }
     },
     "testflight": {
+      "extends": "production",
       "distribution": "store",
-      "autoIncrement": true,
       "ios": {
-        "buildConfiguration": "Release"
+        "simulator": false
       }
     },
     "production": {
@@ -55,14 +55,18 @@
     }
   },
   "submit": {
-    "production": {
-      "ios": {
-        "ascAppId": "YOUR_APP_STORE_CONNECT_APP_ID"
-      }
-    },
     "testflight": {
       "ios": {
-        "ascAppId": "YOUR_APP_STORE_CONNECT_APP_ID"
+        "ascAppId": "681835111",
+        "appleTeamId": "MU9893778V",
+        "appleId": "kyllmaramgmt@gmail.com"
+      }
+    },
+    "production": {
+      "ios": {
+        "ascAppId": "681835111",
+        "appleTeamId": "MU9893778V",
+        "appleId": "kyllmaramgmt@gmail.com"
       }
     }
   }
