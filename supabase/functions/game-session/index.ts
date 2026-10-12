@@ -16,6 +16,7 @@
  */
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { Chess } from "https://esm.sh/chess.js@1.1.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -311,6 +312,7 @@ interface GameRecord {
   time_control_seconds: number;
   increment_seconds: number;
   last_move_at: string | null;
+  draw_offer_by_player_id: string | null;
 }
 
 // ============================================================================
@@ -434,6 +436,15 @@ async function handleValidateMove(
     return jsonResponse({ valid: false, error: validation.error }, 400);
   }
 
+  // Castling: use chess.js to verify king doesn't start in, pass through, or land in check
+  if (isCastling(from, to)) {
+    try {
+      new Chess(gameRecord.current_fen).move({ from, to });
+    } catch {
+      return jsonResponse({ valid: false, error: "Illegal castling (king in, through, or into check)" }, 400);
+    }
+  }
+
   // Apply move to get new FEN (simplified - in production use a chess library)
   const newFen = applyMove(gameRecord.current_fen, from, to, promotion);
   const newMoveCount = gameRecord.move_count + 1;
@@ -530,17 +541,16 @@ async function handleSyncTime(
   request: SyncTimeRequest,
   authenticatedProfileId: string | null
 ): Promise<Response> {
-  const { gameId, playerId, whiteTimeMs, blackTimeMs } = request;
+  const { gameId, playerId } = request;
+  // whiteTimeMs/blackTimeMs are not used — time is computed server-side from last_move_at
 
-  // Verify the caller is the player they claim to be
   if (!authenticatedProfileId || authenticatedProfileId !== playerId) {
     return jsonResponse({ error: "Unauthorized" }, 403);
   }
 
-  // Verify player is in game
   const { data: game } = await supabase
     .from("games")
-    .select("white_player_id, black_player_id, status")
+    .select("white_player_id, black_player_id, status, current_turn, white_time_remaining, black_time_remaining, time_control_seconds, last_move_at")
     .eq("id", gameId)
     .single();
 
@@ -556,16 +566,27 @@ async function handleSyncTime(
     return jsonResponse({ error: "Game is not active" }, 400);
   }
 
-  // Update time
+  let newWhiteTime: number = game.white_time_remaining;
+  let newBlackTime: number = game.black_time_remaining;
+
+  if (game.last_move_at) {
+    const elapsedSec = Math.floor(
+      (Date.now() - new Date(game.last_move_at).getTime()) / 1000
+    );
+    const cap: number = game.time_control_seconds;
+    if (game.current_turn === "w") {
+      newWhiteTime = Math.max(0, Math.min(cap, game.white_time_remaining - elapsedSec));
+    } else {
+      newBlackTime = Math.max(0, Math.min(cap, game.black_time_remaining - elapsedSec));
+    }
+  }
+
   await supabase
     .from("games")
-    .update({
-      white_time_remaining: Math.floor(whiteTimeMs / 1000),
-      black_time_remaining: Math.floor(blackTimeMs / 1000),
-    })
+    .update({ white_time_remaining: newWhiteTime, black_time_remaining: newBlackTime })
     .eq("id", gameId);
 
-  return jsonResponse({ success: true });
+  return jsonResponse({ success: true, whiteTimeRemaining: newWhiteTime, blackTimeRemaining: newBlackTime });
 }
 
 async function handleEndGame(
@@ -616,15 +637,32 @@ async function handleEndGame(
       finalResult = isWhite ? "black_wins" : "white_wins";
       winnerId = isWhite ? game.black_player_id : game.white_player_id;
       break;
-    case "checkmate":
-      if (!finalResult) {
-        // Determine from game state
-        const state = parseFEN(game.current_fen);
-        finalResult = state.turn === "w" ? "black_wins" : "white_wins";
+    case "checkmate": {
+      // Validate server-side — client result field is ignored entirely
+      const chess = new Chess(game.current_fen);
+      if (!chess.isCheckmate()) {
+        return jsonResponse({ error: "Position is not checkmate" }, 400);
       }
+      finalResult = chess.turn() === "w" ? "black_wins" : "white_wins";
       winnerId = finalResult === "white_wins" ? game.white_player_id : game.black_player_id;
       break;
-    case "draw_agreement":
+    }
+    case "draw_agreement": {
+      // Require mutual consent — both players must submit before the draw is finalised
+      if (!game.draw_offer_by_player_id) {
+        await supabase
+          .from("games")
+          .update({ draw_offer_by_player_id: playerId })
+          .eq("id", gameId);
+        return jsonResponse({ pending: true, message: "Draw offer sent" });
+      }
+      if (game.draw_offer_by_player_id === playerId) {
+        return jsonResponse({ pending: true, message: "Draw offer already pending" });
+      }
+      // The other player is accepting — fall through to finalise
+      finalResult = "draw";
+      break;
+    }
     case "stalemate":
     case "insufficient_material":
     case "threefold_repetition":
@@ -864,8 +902,11 @@ function isCapture(state: ChessState, to: string): boolean {
 }
 
 function isCheck(fen: string): boolean {
-  // Simplified - would need full check detection
-  return false;
+  try {
+    return new Chess(fen).isCheck();
+  } catch {
+    return false;
+  }
 }
 
 function isCastling(from: string, to: string): boolean {

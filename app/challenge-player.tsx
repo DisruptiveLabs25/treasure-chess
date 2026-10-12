@@ -9,10 +9,10 @@ import {
   Switch,
   TextInput,
   Image,
-  ActivityIndicator,
   RefreshControl,
   InteractionManager,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import Slider from "@/components/shims/Slider";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter, useLocalSearchParams } from "expo-router";
@@ -337,7 +337,7 @@ export default function ChallengePlayerScreen() {
           <View style={styles.balanceInfo}>
             <Text style={styles.balanceLabel}>Available Balance:</Text>
             {isBalanceLoading ? (
-              <ActivityIndicator size="small" color="#4CAF82" />
+              <LottieSpinner size={24} />
             ) : (
               <Text style={styles.balanceValue}>
                 {availableTct.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} TCT (${(availableTct * TCT_TO_USD).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
@@ -642,7 +642,7 @@ export default function ChallengePlayerScreen() {
           disabled={isSubmitting}
         >
           {isSubmitting ? (
-            <ActivityIndicator size="small" color="#0F0F1E" />
+            <LottieSpinner size={24} />
           ) : (
             <Swords size={20} color="#0F0F1E" />
           )}

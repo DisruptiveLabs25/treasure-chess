@@ -15,10 +15,10 @@ import {
   FlatList,
   Alert,
   Modal,
-  ActivityIndicator,
   Platform,
   KeyboardAvoidingView,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -263,7 +263,7 @@ function AdminTournamentsContent() {
                 disabled={isStarting}
               >
                 {isStarting ? (
-                  <ActivityIndicator size="small" color="#fff" />
+                  <LottieSpinner size={24} />
                 ) : (
                   <>
                     <Ionicons name="play" size={14} color="#fff" />
@@ -383,7 +383,7 @@ function AdminTournamentsContent() {
           {/* Tournament List */}
           {isLoading && tournaments.length === 0 ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#FFD700" />
+              <LottieSpinner size={80} />
             </View>
           ) : (
             <FlatList
@@ -1000,7 +1000,7 @@ function TournamentFormModal({
               disabled={isSubmitting}
             >
               {isSubmitting ? (
-                <ActivityIndicator size="small" color="#000" />
+                <LottieSpinner size={24} />
               ) : (
                 <Text style={styles.submitButtonText}>{submitLabel}</Text>
               )}

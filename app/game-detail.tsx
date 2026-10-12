@@ -16,12 +16,12 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  ActivityIndicator,
   Share,
   Alert,
   Dimensions,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import {
   ArrowLeft,
@@ -438,7 +438,7 @@ export default function GameDetailScreen() {
     return (
       <LinearGradient colors={["#05060f", "#0F0F1E"]} style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FFD700" />
+          <LottieSpinner size={80} />
           <Text style={styles.loadingText}>Loading game...</Text>
         </View>
       </LinearGradient>

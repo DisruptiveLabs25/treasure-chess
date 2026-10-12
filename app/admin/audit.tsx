@@ -12,8 +12,8 @@ import {
   FlatList,
   TouchableOpacity,
   RefreshControl,
-  ActivityIndicator,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -89,7 +89,7 @@ function AdminAuditContent() {
     if (!isLoadingMore) return null;
     return (
       <View style={styles.loadingMore}>
-        <ActivityIndicator size="small" color="#FFD700" />
+        <LottieSpinner size={24} />
       </View>
     );
   };
@@ -145,7 +145,7 @@ function AdminAuditContent() {
           {/* Log List */}
           {isLoading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#FFD700" />
+              <LottieSpinner size={80} />
               <Text style={styles.loadingText}>Loading audit logs...</Text>
             </View>
           ) : (

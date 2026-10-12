@@ -40,12 +40,12 @@ import {
   ScrollView,
   StatusBar,
   RefreshControl,
-  ActivityIndicator,
   Animated,
   Image,
   Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRewards } from "@/hooks/useRewards";
 import type { UserReward, UserAchievement } from "@/lib/rewards";
@@ -63,6 +63,7 @@ import {
 import { useSoundAndHaptics } from "@/hooks/useSoundAndHaptics";
 import { Lock } from "lucide-react-native";
 import { useDragonAvatars } from "@/hooks/useDragonAvatars";
+import { ParallaxBackground } from "@/components/ParallaxBackground";
 
 // ============================================================================
 // Types
@@ -205,7 +206,7 @@ function RewardCard({ userReward, onClaim, isClaiming }: RewardCardProps) {
               disabled={isClaiming}
             >
               {isClaiming ? (
-                <ActivityIndicator size="small" color="#0F0F1E" />
+                <LottieSpinner size={24} />
               ) : (
                 <>
                   <Gift size={16} color="#0F0F1E" />
@@ -401,7 +402,7 @@ function DragonRewardCard({ reward, onClaim, isClaiming }: DragonRewardCardProps
                   disabled={isClaiming}
                 >
                   {isClaiming ? (
-                    <ActivityIndicator size="small" color="#0F0F1E" />
+                    <LottieSpinner size={24} />
                   ) : (
                     <>
                       <Gift size={12} color="#0F0F1E" />
@@ -706,6 +707,7 @@ export default function RewardsScreen() {
 
   return (
     <View style={styles.container}>
+      <ParallaxBackground />
       <Stack.Screen options={{ headerShown: false }} />
       <StatusBar barStyle="light-content" />
       <LinearGradient colors={["#0F0F1E", "#1A1A2E"]} style={styles.gradient}>
@@ -725,7 +727,7 @@ export default function RewardsScreen() {
               disabled={isRefreshing}
             >
               {isRefreshing ? (
-                <ActivityIndicator size="small" color="#FFD700" />
+                <LottieSpinner size={24} />
               ) : (
                 <RefreshCw size={20} color="#FFD700" />
               )}
@@ -757,7 +759,7 @@ export default function RewardsScreen() {
           {/* Content */}
           {(isLoading || isDragonLoading) ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#FFD700" />
+              <LottieSpinner size={80} />
               <Text style={styles.loadingText}>Loading rewards...</Text>
             </View>
           ) : error ? (

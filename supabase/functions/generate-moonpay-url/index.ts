@@ -10,10 +10,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
-function toBase64Url(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  const base64 = btoa(String.fromCharCode(...bytes));
-  return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+function toBase64(buffer: ArrayBuffer): string {
+  return btoa(String.fromCharCode(...new Uint8Array(buffer)));
 }
 
 async function signQueryString(queryString: string, secret: string): Promise<string> {
@@ -25,7 +23,7 @@ async function signQueryString(queryString: string, secret: string): Promise<str
     ["sign"]
   );
   const mac = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(queryString));
-  return toBase64Url(mac);
+  return toBase64(mac);
 }
 
 serve(async (req: Request) => {
@@ -65,12 +63,11 @@ serve(async (req: Request) => {
       apiKey: MOONPAY_PUBLISHABLE_KEY,
       walletAddress,
       currencyCode,
-      colorCode: "#F5C400",
     });
 
     const queryString = `?${params.toString()}`;
     const signature = await signQueryString(queryString, MOONPAY_SECRET_KEY);
-    const url = `https://${host}${queryString}&signature=${signature}`;
+    const url = `https://${host}${queryString}&signature=${encodeURIComponent(signature)}`;
 
     return new Response(JSON.stringify({ url }), {
       status: 200,

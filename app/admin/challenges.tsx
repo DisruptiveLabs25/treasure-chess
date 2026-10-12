@@ -12,9 +12,9 @@ import {
   ScrollView,
   TouchableOpacity,
   FlatList,
-  ActivityIndicator,
   Platform,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -306,7 +306,7 @@ function AdminChallengesContent() {
           {/* List */}
           {isLoading && challenges.length === 0 ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#FFD700" />
+              <LottieSpinner size={80} />
             </View>
           ) : (
             <FlatList

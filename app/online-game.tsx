@@ -16,10 +16,10 @@ import {
   TouchableOpacity,
   Alert,
   Dimensions,
-  ActivityIndicator,
   Image,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { Chess, Square, Move, PieceSymbol as ChessPieceSymbol } from "chess.js";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Clock, Flag, MessageCircle, X } from "lucide-react-native";
@@ -1191,7 +1191,7 @@ export default function OnlineGameScreen() {
     return (
       <LinearGradient colors={["#0F0F1E", "#1A1A2E"]} style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FFD700" />
+          <LottieSpinner size={80} />
           <Text style={styles.loadingText}>Loading game...</Text>
         </View>
       </LinearGradient>

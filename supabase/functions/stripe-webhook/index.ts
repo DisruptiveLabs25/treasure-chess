@@ -159,15 +159,15 @@ serve(async (req: Request) => {
 
   const rawBody = await req.text();
 
-  // Verify signature
-  if (STRIPE_WEBHOOK_SECRET) {
-    const valid = await verifyStripeSignature(rawBody, sig, STRIPE_WEBHOOK_SECRET);
-    if (!valid) {
-      console.error("[stripe-webhook] Invalid signature");
-      return new Response("Invalid signature", { status: 400 });
-    }
-  } else {
-    console.warn("[stripe-webhook] STRIPE_WEBHOOK_SECRET not set — skipping verification");
+  // Verify signature — missing secret is a configuration error, not a skip
+  if (!STRIPE_WEBHOOK_SECRET) {
+    console.error("[stripe-webhook] STRIPE_WEBHOOK_SECRET is not configured");
+    return new Response("Webhook secret not configured", { status: 400 });
+  }
+  const valid = await verifyStripeSignature(rawBody, sig, STRIPE_WEBHOOK_SECRET);
+  if (!valid) {
+    console.error("[stripe-webhook] Invalid signature");
+    return new Response("Invalid signature", { status: 400 });
   }
 
   let event: { type: string; data: { object: Record<string, unknown> } };

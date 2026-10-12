@@ -168,7 +168,7 @@ async function processWithdrawals(
       }
 
       // Calculate amount in smallest units
-      const amountWei = BigInt(Math.floor(request.amount_usdc * Math.pow(10, USDC_DECIMALS)));
+      const amountWei = BigInt(Math.round(request.amount_usdc * 1e6));
 
       console.log(`Processing withdrawal ${request.id}: ${request.amount_usdc} USDC to ${request.to_address}`);
 

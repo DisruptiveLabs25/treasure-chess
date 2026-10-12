@@ -11,11 +11,11 @@ import {
   StatusBar,
   Platform,
   RefreshControl,
-  ActivityIndicator,
   FlatList,
   Animated,
   Image,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import * as Clipboard from "expo-clipboard";
 import { LinearGradient } from "expo-linear-gradient";
 import {
@@ -57,6 +57,7 @@ import {
   BorderRadius,
   Shadows,
 } from "@/constants/theme";
+import { ParallaxBackground } from "@/components/ParallaxBackground";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -438,7 +439,7 @@ function WalletContent() {
   if (!profile) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color={Colors.primary} />
+        <LottieSpinner size={80} />
         <Text style={styles.loadingText}>Loading wallet…</Text>
       </View>
     );
@@ -471,7 +472,7 @@ function WalletContent() {
 
         <View style={styles.balanceRow}>
           {isLoadingBalance || isLoadingOnChainBalance ? (
-            <ActivityIndicator size="small" color={Colors.primary} />
+            <LottieSpinner size={24} />
           ) : (
             <Text style={styles.balanceAmount}>
               {tctBalance.toLocaleString("en-US", { maximumFractionDigits: 0 })}
@@ -593,7 +594,7 @@ function WalletContent() {
 
   const EmptyState = isLoadingTransactions ? (
     <View style={styles.centered}>
-      <ActivityIndicator size="large" color={Colors.primary} />
+      <LottieSpinner size={80} />
     </View>
   ) : (
     <View style={styles.emptyContainer}>
@@ -672,7 +673,7 @@ function WalletContent() {
   const ListFooter =
     isLoadingTransactions && combinedTransactions.length > 0 ? (
       <View style={styles.footerLoader}>
-        <ActivityIndicator size="small" color={Colors.primary} />
+        <LottieSpinner size={24} />
       </View>
     ) : hasMoreTransactions ? (
       <TouchableOpacity style={styles.loadMoreBtn} onPress={handleLoadMore}>
@@ -684,6 +685,7 @@ function WalletContent() {
 
   return (
     <View style={styles.screen}>
+      <ParallaxBackground />
       <StatusBar
         barStyle="light-content"
         backgroundColor={Colors.background}

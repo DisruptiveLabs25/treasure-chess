@@ -10,8 +10,8 @@ import {
   View,
   Text,
   StyleSheet,
-  ActivityIndicator,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter, useLocalSearchParams } from "expo-router";
@@ -189,11 +189,7 @@ export default function TwitchOAuthCallbackScreen() {
 
           {/* Loading indicator */}
           {result.status === "processing" && (
-            <ActivityIndicator
-              size="large"
-              color="#9146FF"
-              style={styles.loader}
-            />
+            <LottieSpinner size={80} style={styles.loader} />
           )}
 
           {/* Error action */}

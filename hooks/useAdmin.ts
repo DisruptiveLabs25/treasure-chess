@@ -403,23 +403,17 @@ export function useAdmin(): UseAdminReturn {
     []
   );
 
-  // 2FA
+  // 2FA not implemented in V1 — returns false to prevent false elevation
   const verify2FA = useCallback(async (): Promise<boolean> => {
-    // In a real implementation, this would trigger biometric auth
-    // For now, we'll mark as verified
-    setState((prev) => ({ ...prev, is2FAVerified: true }));
-    return true;
+    return false;
   }, []);
 
+  // 2FA gate disabled in V1 — always returns false (no gate)
   const require2FAForAction = useCallback(
-    (actionSeverity: AdminActionSeverity): boolean => {
-      // Require 2FA for high and critical actions
-      if (actionSeverity === "high" || actionSeverity === "critical") {
-        return state.requires2FA && !state.is2FAVerified;
-      }
+    (_actionSeverity: AdminActionSeverity): boolean => {
       return false;
     },
-    [state.requires2FA, state.is2FAVerified]
+    []
   );
 
   // Utilities

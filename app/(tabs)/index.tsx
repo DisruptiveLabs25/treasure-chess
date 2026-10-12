@@ -33,9 +33,10 @@ import {
   Share,
   Animated,
   Dimensions,
-  ActivityIndicator,
   RefreshControl,
 } from "react-native";
+import LottieView from "lottie-react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useApp } from "@/contexts/AppContext";
 import { MatchmakingBanner } from "@/components/MatchmakingBanner";
@@ -45,6 +46,7 @@ import { useHomeStats, type ValueChangeEvent } from "@/hooks/useHomeStats";
 import { useUserStore } from "@/stores/userStore";
 import { createChallengeService } from "@/lib/challenges";
 import { Colors, FontFamily, Spacing, BorderRadius, Shadows } from "@/constants/theme";
+import { ParallaxBackground } from "@/components/ParallaxBackground";
 
 const { width } = Dimensions.get("window");
 
@@ -77,43 +79,24 @@ function getGreeting(): string {
 // ============================================================================
 
 function WelcomeScreen({ onComplete }: { onComplete: () => void }) {
-  const scaleAnim = useRef(new Animated.Value(0.75)).current;
-  const opacityAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
-  const ringAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(opacityAnim, { toValue: 1, duration: 500, useNativeDriver: true }),
-      Animated.spring(scaleAnim, { toValue: 1, friction: 5, tension: 70, useNativeDriver: true }),
-      Animated.timing(ringAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
-    ]).start(() => {
-      setTimeout(() => {
-        Animated.timing(fadeAnim, { toValue: 0, duration: 450, useNativeDriver: true }).start(onComplete);
-      }, 1100);
-    });
+    const t = setTimeout(() => {
+      Animated.timing(fadeAnim, { toValue: 0, duration: 300, useNativeDriver: true }).start(onComplete);
+    }, 1400);
+    return () => clearTimeout(t);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const ringScale = ringAnim.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1.18] });
-  const ringOpacity = ringAnim.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0.5, 0.25, 0] });
 
   return (
     <Animated.View style={[welcomeStyles.container, { opacity: fadeAnim }]}>
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
-      <Animated.View style={[welcomeStyles.logoWrap, { opacity: opacityAnim, transform: [{ scale: scaleAnim }] }]}>
-        {/* Expanding ring pulse */}
-        <Animated.View
-          style={[
-            welcomeStyles.ring,
-            { opacity: ringOpacity, transform: [{ scale: ringScale }] },
-          ]}
-        />
-        {/* Gold coin mark */}
-        <View style={welcomeStyles.coin}>
-          <Text style={welcomeStyles.coinText}>TC</Text>
-        </View>
-        <Text style={welcomeStyles.wordmark}>TREASURE CHESS</Text>
-      </Animated.View>
+      <LottieView
+        source={require("../../assets/animations/SplashScreenLoading.json")}
+        autoPlay
+        loop
+        style={welcomeStyles.lottie}
+      />
     </Animated.View>
   );
 }
@@ -125,40 +108,9 @@ const welcomeStyles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  logoWrap: { alignItems: "center", gap: 20 },
-  ring: {
-    position: "absolute",
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 2,
-    borderColor: Colors.primary,
-  },
-  coin: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: Colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.45,
-    shadowRadius: 20,
-    elevation: 12,
-  },
-  coinText: {
-    fontFamily: FontFamily.spaceGroteskBold,
-    fontSize: 32,
-    color: Colors.onPrimary,
-    letterSpacing: -1,
-  },
-  wordmark: {
-    fontFamily: FontFamily.interSemiBold,
-    fontSize: 11,
-    letterSpacing: 4,
-    color: Colors.textSecondary,
-    textTransform: "uppercase",
+  lottie: {
+    width: "100%",
+    height: "100%",
   },
 });
 
@@ -476,7 +428,7 @@ export default function HomeScreen() {
   if (isAuthLoading) {
     return (
       <View style={[styles.root, { justifyContent: "center", alignItems: "center" }]}>
-        <ActivityIndicator size="large" color={Colors.primary} />
+        <LottieSpinner size={80} />
       </View>
     );
   }
@@ -487,6 +439,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.root}>
+      <ParallaxBackground />
       <StatusBar barStyle="light-content" />
 
       <ScrollView
@@ -633,7 +586,7 @@ export default function HomeScreen() {
           <View style={styles.heroBtnGradient}>
             {customChallengeMatchmaking.isWaiting ? (
               <>
-                <ActivityIndicator size="small" color={Colors.onPrimary} />
+                <LottieSpinner size={24} />
                 <Text style={styles.heroBtnText}>Searching…</Text>
               </>
             ) : (

@@ -18,12 +18,12 @@ import {
   ScrollView,
   TextInput,
   Alert,
-  ActivityIndicator,
   Linking,
   Dimensions,
   Platform,
   RefreshControl,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter } from "expo-router";
 import * as Clipboard from "expo-clipboard";
 import * as WebBrowser from "expo-web-browser";
@@ -75,6 +75,12 @@ const REQUIRED_CONFIRMATIONS = 12;
 const USDC_CONTRACT_ADDRESS = process.env.EXPO_PUBLIC_USDC_CONTRACT || "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 const NETWORK_NAME = "Base";
 const BLOCK_EXPLORER = "https://basescan.org";
+
+// TEST-ONLY: sandbox fallback address used when no real wallet is available
+const SANDBOX_WALLET_FALLBACK =
+  process.env.EXPO_PUBLIC_SKIP_AUTH === "true"
+    ? "0x742d35Cc6634C0532925a3b8D4C9C1B2b4eD9e1"
+    : null;
 
 type DepositMethod = "fiat" | "crypto";
 type DepositStep = "select" | "amount" | "fiat-confirm" | "crypto-address" | "pending";
@@ -392,7 +398,7 @@ export default function DepositScreen() {
 
   // MoonPay card payment — generates a signed widget URL and opens it in-browser
   const handleMoonPayCheckout = useCallback(async () => {
-    const userWalletAddress = profile?.embeddedWalletAddress || walletAddress;
+    const userWalletAddress = profile?.embeddedWalletAddress || walletAddress || SANDBOX_WALLET_FALLBACK;
     if (!userWalletAddress) {
       Alert.alert("No Wallet", "No wallet address found. Please set up your wallet first.");
       return;
@@ -702,7 +708,7 @@ export default function DepositScreen() {
                 end={{ x: 1, y: 0 }}
               >
                 {isMoonPayLoading ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
+                  <LottieSpinner size={24} />
                 ) : (
                   <>
                     <CreditCard size={20} color="#FFFFFF" />
@@ -802,7 +808,7 @@ export default function DepositScreen() {
                 end={{ x: 1, y: 0 }}
               >
                 {isSubmittingFiat ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
+                  <LottieSpinner size={24} />
                 ) : (
                   <>
                     <CreditCard size={20} color="#FFFFFF" />
@@ -872,7 +878,7 @@ export default function DepositScreen() {
         <Text style={styles.headerTitle}>Deposit</Text>
         <TouchableOpacity onPress={handleRefresh} style={styles.refreshButton} disabled={isLoading}>
           {isLoading ? (
-            <ActivityIndicator size="small" color="#FFD700" />
+            <LottieSpinner size={24} />
           ) : (
             <RefreshCw size={20} color="#FFD700" />
           )}

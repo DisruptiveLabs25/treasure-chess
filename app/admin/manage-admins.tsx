@@ -13,10 +13,10 @@ import {
   FlatList,
   TouchableOpacity,
   TextInput,
-  ActivityIndicator,
   Alert,
   Platform,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -261,7 +261,7 @@ function ManageAdminsContent() {
                 disabled={actionLoading === item.id}
               >
                 {actionLoading === item.id ? (
-                  <ActivityIndicator size="small" color="#FFD700" />
+                  <LottieSpinner size={24} />
                 ) : (
                   <>
                     <Ionicons name="star" size={14} color="#FFD700" />
@@ -276,7 +276,7 @@ function ManageAdminsContent() {
               disabled={actionLoading === item.id}
             >
               {actionLoading === item.id ? (
-                <ActivityIndicator size="small" color="#FF453A" />
+                <LottieSpinner size={24} />
               ) : (
                 <>
                   <Ionicons name="close-circle" size={16} color="#FF453A" />
@@ -332,7 +332,7 @@ function ManageAdminsContent() {
                     disabled={actionLoading === item.id}
                   >
                     {actionLoading === item.id ? (
-                      <ActivityIndicator size="small" color="#FFD700" />
+                      <LottieSpinner size={24} />
                     ) : (
                       <>
                         <Ionicons name="star" size={14} color="#FFD700" />
@@ -347,7 +347,7 @@ function ManageAdminsContent() {
                   disabled={actionLoading === item.id}
                 >
                   {actionLoading === item.id ? (
-                    <ActivityIndicator size="small" color="#FF453A" />
+                    <LottieSpinner size={24} />
                   ) : (
                     <>
                       <Ionicons name="close-circle" size={16} color="#FF453A" />
@@ -363,7 +363,7 @@ function ManageAdminsContent() {
                 disabled={actionLoading === item.id}
               >
                 {actionLoading === item.id ? (
-                  <ActivityIndicator size="small" color="#4CAF82" />
+                  <LottieSpinner size={24} />
                 ) : (
                   <>
                     <Ionicons name="shield-checkmark" size={16} color="#4CAF82" />
@@ -472,7 +472,7 @@ function ManageAdminsContent() {
           {activeTab === "admins" ? (
             loadingAdmins && admins.length === 0 ? (
               <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#FFD700" />
+                <LottieSpinner size={80} />
               </View>
             ) : (
               <FlatList
@@ -523,7 +523,7 @@ function ManageAdminsContent() {
                   disabled={searching || !searchQuery.trim()}
                 >
                   {searching ? (
-                    <ActivityIndicator size="small" color="#fff" />
+                    <LottieSpinner size={24} />
                   ) : (
                     <Text style={styles.searchButtonText}>Search</Text>
                   )}

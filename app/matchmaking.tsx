@@ -15,12 +15,12 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
   Alert,
   ScrollView,
   Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Users,
@@ -518,7 +518,7 @@ function MatchmakingContent() {
             </View>
 
             <View style={styles.searchingCard}>
-              <ActivityIndicator size="large" color="#FFD700" />
+              <LottieSpinner size={80} />
               <View style={styles.timeContainer}>
                 <Clock size={20} color="#FFD700" />
                 <Text style={styles.timeText}>{formatTime(searchDuration)}</Text>
@@ -608,7 +608,7 @@ function MatchmakingContent() {
               end={{ x: 1, y: 1 }}
             >
               {isJoiningQueue ? (
-                <ActivityIndicator color="#FFF" />
+                <LottieSpinner size={24} />
               ) : (
                 <>
                   <Play size={24} color="#0F0F1E" />

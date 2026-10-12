@@ -17,11 +17,11 @@ import {
   FlatList,
   RefreshControl,
   TouchableOpacity,
-  ActivityIndicator,
   Dimensions,
   Animated,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import {
@@ -351,7 +351,7 @@ export default function ProfileScreen() {
         <View style={styles.statsSection}>
           {isLoadingStats ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="small" color="#FFD700" />
+              <LottieSpinner size={24} />
               <Text style={styles.loadingText}>Loading statistics...</Text>
             </View>
           ) : stats ? (
@@ -400,7 +400,7 @@ export default function ProfileScreen() {
     if (isLoadingMore) {
       return (
         <View style={styles.footerLoader}>
-          <ActivityIndicator size="small" color="#FFD700" />
+          <LottieSpinner size={24} />
         </View>
       );
     }

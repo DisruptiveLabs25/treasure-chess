@@ -5,15 +5,16 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  ActivityIndicator,
   RefreshControl,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
+import { ParallaxBackground } from "@/components/ParallaxBackground";
 
 interface Ticket {
   id: string;
@@ -147,6 +148,7 @@ export default function SupportTicketList() {
 
   return (
     <View style={styles.container}>
+      <ParallaxBackground />
       <LinearGradient colors={["#0F0F1E", "#1A1A2E"]} style={styles.gradient}>
         <SafeAreaView style={styles.safeArea} edges={["top"]}>
           <View style={styles.header}>
@@ -167,7 +169,7 @@ export default function SupportTicketList() {
 
           {isLoading ? (
             <View style={styles.centerContainer}>
-              <ActivityIndicator size="large" color="#FFD700" />
+              <LottieSpinner size={80} />
             </View>
           ) : tickets.length === 0 ? (
             <View style={styles.centerContainer}>

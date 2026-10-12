@@ -15,10 +15,10 @@ import {
   FlatList,
   Alert,
   Modal,
-  ActivityIndicator,
   Platform,
   KeyboardAvoidingView,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -515,7 +515,7 @@ function AdminUsersContent() {
               disabled={isSearching}
             >
               {isSearching ? (
-                <ActivityIndicator size="small" color="#0F0F1E" />
+                <LottieSpinner size={24} />
               ) : (
                 <Text style={styles.searchButtonText}>Search</Text>
               )}
@@ -561,7 +561,7 @@ function AdminUsersContent() {
             ListEmptyComponent={
               <View style={styles.emptyContainer}>
                 {isSearching ? (
-                  <ActivityIndicator size="large" color="#FFD700" />
+                  <LottieSpinner size={80} />
                 ) : hasSearched ? (
                   <>
                     <Ionicons name="search" size={48} color="#666" />
@@ -803,7 +803,7 @@ function AdminUsersContent() {
               disabled={isActionLoading}
             >
               {isActionLoading ? (
-                <ActivityIndicator size="small" color="#fff" />
+                <LottieSpinner size={24} />
               ) : (
                 <Text style={styles.modalButtonText}>
                   {actionModal.type === "ban" && "Confirm Ban"}
@@ -841,7 +841,7 @@ function AdminUsersContent() {
 
             {isLoadingUser ? (
               <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#FFD700" />
+                <LottieSpinner size={80} />
               </View>
             ) : selectedUser ? (
               <ScrollView style={styles.detailScroll}>

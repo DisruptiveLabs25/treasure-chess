@@ -13,9 +13,9 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
-  ActivityIndicator,
   Switch,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -161,7 +161,7 @@ function AdminSettingsContent() {
       <View style={styles.container}>
         <LinearGradient colors={["#0F0F1E", "#1A1A2E"]} style={styles.gradient}>
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#FFD700" />
+            <LottieSpinner size={80} />
             <Text style={styles.loadingText}>Loading settings...</Text>
           </View>
         </LinearGradient>
@@ -368,7 +368,7 @@ function AdminSettingsContent() {
                 disabled={isSaving}
               >
                 {isSaving ? (
-                  <ActivityIndicator size="small" color="#0F0F1E" />
+                  <LottieSpinner size={24} />
                 ) : (
                   <>
                     <Ionicons name="save" size={20} color="#0F0F1E" />

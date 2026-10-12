@@ -19,12 +19,12 @@ import {
   ScrollView,
   TextInput,
   Alert,
-  ActivityIndicator,
   Linking,
   Dimensions,
   Platform,
   RefreshControl,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
 import * as WebBrowser from "expo-web-browser";
@@ -74,6 +74,12 @@ const TCT_TO_USD_RATE = 0.04; // 1 TCT = $0.04 (25 TCT = $1)
 const USDC_TO_TCT = 25; // 1 USDC = 25 TCT
 const MIN_WITHDRAWAL_TCT = 250;   // Flat $10 minimum across all methods
 const WITHDRAWAL_FEE_PERCENT = 6.5; // 6.5% total (5% platform + 1.5% processing fee)
+
+// TEST-ONLY: sandbox fallback address used when no real wallet is available
+const SANDBOX_WALLET_FALLBACK =
+  process.env.EXPO_PUBLIC_SKIP_AUTH === "true"
+    ? "0x742d35Cc6634C0532925a3b8D4C9C1B2b4eD9e1"
+    : null;
 
 type WithdrawalMethod = "base" | "bridge" | "bank";
 type WithdrawalStep =
@@ -299,7 +305,7 @@ export default function WithdrawScreen() {
   const lockedBalance = onChainLockedTct;
 
   // Get wallet address
-  const cryptoAddress = walletAddress || profile?.embeddedWalletAddress || null;
+  const cryptoAddress = walletAddress || profile?.embeddedWalletAddress || SANDBOX_WALLET_FALLBACK;
 
   // Destination chains (exclude Base for bridge, since Base is the source)
   const bridgeChains = useMemo(() => {
@@ -1107,7 +1113,7 @@ export default function WithdrawScreen() {
           >
             {isFetchingQuote ? (
               <>
-                <ActivityIndicator size="small" color="#FFFFFF" />
+                <LottieSpinner size={24} />
                 <Text style={styles.continueButtonText}>Fetching Quote...</Text>
               </>
             ) : (
@@ -1309,7 +1315,7 @@ export default function WithdrawScreen() {
           >
             {isLoading ? (
               <>
-                <ActivityIndicator size="small" color="#FFFFFF" />
+                <LottieSpinner size={24} />
                 <Text style={styles.continueButtonText}>Submitting...</Text>
               </>
             ) : (
@@ -1442,7 +1448,7 @@ export default function WithdrawScreen() {
           >
             {isMoonPayLoading || isLoading ? (
               <>
-                <ActivityIndicator size="small" color="#FFFFFF" />
+                <LottieSpinner size={24} />
                 <Text style={styles.continueButtonText}>Processing...</Text>
               </>
             ) : (
@@ -1464,7 +1470,7 @@ export default function WithdrawScreen() {
       <View style={styles.stepContent}>
         <View style={styles.completeCard}>
           <View style={styles.completeIconContainer}>
-            <ActivityIndicator size="large" color="#4CAF82" />
+            <LottieSpinner size={80} />
           </View>
 
           <Text style={styles.completeTitle}>Bridging in Progress</Text>
@@ -1585,7 +1591,7 @@ export default function WithdrawScreen() {
         <Text style={styles.headerTitle}>Withdraw</Text>
         <TouchableOpacity onPress={handleRefresh} style={styles.refreshButton} disabled={isRefreshing}>
           {isRefreshing ? (
-            <ActivityIndicator size="small" color="#FFD700" />
+            <LottieSpinner size={24} />
           ) : (
             <RefreshCw size={20} color="#FFD700" />
           )}

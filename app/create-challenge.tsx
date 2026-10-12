@@ -16,11 +16,11 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
-  ActivityIndicator,
   Share,
   TextInput,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -905,7 +905,7 @@ export default function CreateChallengeScreen() {
           style={styles.createButtonGradient}
         >
           {isProcessing ? (
-            <ActivityIndicator color="#FFF" />
+            <LottieSpinner size={24} />
           ) : (
             <>
               <Text style={styles.createButtonText}>Create Challenge</Text>
@@ -1006,7 +1006,7 @@ export default function CreateChallengeScreen() {
               <>
                 <Clock size={24} color="#A0A0A0" />
                 <Text style={styles.playerName}>Waiting...</Text>
-                <ActivityIndicator size="small" color="#A0A0A0" style={{ marginTop: 8 }} />
+                <LottieSpinner size={24} style={{ marginTop: 8 }} />
               </>
             )}
           </LinearGradient>
@@ -1027,7 +1027,7 @@ export default function CreateChallengeScreen() {
             style={styles.readyButtonGradient}
           >
             {isLockingFunds || isCreating ? (
-              <ActivityIndicator color="#FFF" size="small" />
+              <LottieSpinner size={24} />
             ) : (
               <>
                 <Wallet size={20} color="#FFF" />
@@ -1046,7 +1046,7 @@ export default function CreateChallengeScreen() {
       {opponentJoined && amIReady && !bothReady && (
         <View>
           <View style={styles.waitingMessage}>
-            <ActivityIndicator color="#4CAF82" size="small" />
+            <LottieSpinner size={24} />
             <Text style={styles.waitingMessageText}>
               Waiting for {isCreator ? opponentUsername : creatorUsername} to ready up...
             </Text>
@@ -1063,7 +1063,7 @@ export default function CreateChallengeScreen() {
       {/* Both ready - starting game */}
       {bothReady && (
         <View style={styles.gameStartingMessage}>
-          <ActivityIndicator color="#FFD700" size="small" />
+          <LottieSpinner size={24} />
           <Text style={styles.gameStartingText}>
             Starting game...
           </Text>
@@ -1162,7 +1162,7 @@ export default function CreateChallengeScreen() {
               disabled={isCancelling}
             >
               {isCancelling ? (
-                <ActivityIndicator color="#E05C5C" size="small" />
+                <LottieSpinner size={24} />
               ) : (
                 <Text style={styles.cancelButtonText}>Cancel Challenge</Text>
               )}

@@ -6,10 +6,10 @@ import {
   TouchableOpacity,
   FlatList,
   TextInput,
-  ActivityIndicator,
   RefreshControl,
   Alert,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -339,7 +339,7 @@ function AdminSupportTicketsContent() {
                   disabled={isUpdatingStatus === item.id}
                 >
                   {isUpdatingStatus === item.id ? (
-                    <ActivityIndicator size="small" color="#4CAF82" />
+                    <LottieSpinner size={24} />
                   ) : (
                     <>
                       <Ionicons name="time-outline" size={14} color="#4CAF82" />
@@ -355,7 +355,7 @@ function AdminSupportTicketsContent() {
                   disabled={isUpdatingStatus === item.id}
                 >
                   {isUpdatingStatus === item.id ? (
-                    <ActivityIndicator size="small" color="#34C759" />
+                    <LottieSpinner size={24} />
                   ) : (
                     <>
                       <Ionicons name="checkmark-circle-outline" size={14} color="#34C759" />
@@ -369,7 +369,7 @@ function AdminSupportTicketsContent() {
             {/* Messages */}
             <View style={styles.messagesContainer}>
               {messages.length === 0 ? (
-                <ActivityIndicator size="small" color="#FFD700" />
+                <LottieSpinner size={24} />
               ) : (
                 messages.map(renderMessage)
               )}
@@ -398,7 +398,7 @@ function AdminSupportTicketsContent() {
                   disabled={!reply.trim() || isSending === item.id}
                 >
                   {isSending === item.id ? (
-                    <ActivityIndicator size="small" color="#0F0F1E" />
+                    <LottieSpinner size={24} />
                   ) : (
                     <Ionicons name="send" size={16} color="#0F0F1E" />
                   )}
@@ -461,7 +461,7 @@ function AdminSupportTicketsContent() {
 
           {isLoading ? (
             <View style={styles.centerContainer}>
-              <ActivityIndicator size="large" color="#FFD700" />
+              <LottieSpinner size={80} />
             </View>
           ) : tickets.length === 0 ? (
             <View style={styles.centerContainer}>

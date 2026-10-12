@@ -20,7 +20,6 @@ import {
   TouchableOpacity,
   Alert,
   RefreshControl,
-  ActivityIndicator,
   Modal,
   TextInput,
   FlatList,
@@ -28,6 +27,7 @@ import {
   Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import {
   Sword,
   Clock,
@@ -723,7 +723,7 @@ function ChallengeBoardContent() {
                   >
                     {isJoining ? (
                       <View style={styles.joiningContainer}>
-                        <ActivityIndicator size="small" color="#000" />
+                        <LottieSpinner size={24} />
                         <Text style={styles.acceptButtonText}>Joining...</Text>
                       </View>
                     ) : (
@@ -1088,13 +1088,13 @@ function ChallengeBoardContent() {
           <View style={styles.challengeList}>
             {isLoading || (selectedTab === "history" && historyLoading) ? (
               <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#FFD700" />
+                <LottieSpinner size={80} />
                 <Text style={styles.loadingText}>Loading challenges...</Text>
               </View>
             ) : selectedTab === "house" ? (
               houseChallengesLoading ? (
                 <View style={styles.loadingContainer}>
-                  <ActivityIndicator size="large" color="#FFD700" />
+                  <LottieSpinner size={80} />
                   <Text style={styles.loadingText}>Loading challenges...</Text>
                 </View>
               ) : houseChallenges.length > 0 ? (
@@ -1196,7 +1196,7 @@ function ChallengeBoardContent() {
             <View style={friendSearchStyles.resultsContainer}>
               {friendSearchLoading ? (
                 <View style={friendSearchStyles.centeredState}>
-                  <ActivityIndicator size="small" color="#FFD700" />
+                  <LottieSpinner size={24} />
                   <Text style={friendSearchStyles.centeredStateText}>Searching...</Text>
                 </View>
               ) : friendSearchQuery.length >= 2 && friendSearchResults.length === 0 ? (

@@ -17,10 +17,10 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
-  ActivityIndicator,
   Animated,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -552,7 +552,7 @@ export default function PlayNowScreen() {
                   disabled={!canAffordJoin || isJoining}
                 >
                   {isJoining ? (
-                    <ActivityIndicator color="#FFF" size="small" />
+                    <LottieSpinner size={24} />
                   ) : (
                     <Text style={[
                       styles.lobbyJoinButtonText,
@@ -737,11 +737,7 @@ export default function PlayNowScreen() {
           You play as {playerColor === "w" ? "White" : "Black"}
         </Text>
 
-        <ActivityIndicator
-          color="#4CAF82"
-          size="small"
-          style={{ marginTop: 20 }}
-        />
+        <LottieSpinner size={24} style={{ marginTop: 20 }} />
         <Text style={styles.loadingGameText}>Starting game...</Text>
       </Animated.View>
     </View>

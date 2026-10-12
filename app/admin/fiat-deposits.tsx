@@ -5,11 +5,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  ActivityIndicator,
   RefreshControl,
   Alert,
   TextInput,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -254,7 +254,7 @@ function AdminFiatDepositsContent() {
               disabled={isProcessing}
             >
               {isProcessing ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
+                <LottieSpinner size={24} />
               ) : (
                 <>
                   <Ionicons name="checkmark-circle" size={18} color="#FFFFFF" />
@@ -318,7 +318,7 @@ function AdminFiatDepositsContent() {
 
           {isLoading ? (
             <View style={styles.centerContainer}>
-              <ActivityIndicator size="large" color="#FFD700" />
+              <LottieSpinner size={80} />
             </View>
           ) : deposits.length === 0 ? (
             <View style={styles.centerContainer}>

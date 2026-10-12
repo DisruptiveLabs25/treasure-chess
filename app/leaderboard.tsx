@@ -21,9 +21,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   RefreshControl,
-  ActivityIndicator,
 } from "react-native";
 import { FlashList } from "@shopify/flash-list";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -230,7 +230,7 @@ function ErrorState({ error, onRetry, isRetrying }: ErrorStateProps) {
         activeOpacity={0.7}
       >
         {isRetrying ? (
-          <ActivityIndicator size="small" color="#0F0F1E" />
+          <LottieSpinner size={24} />
         ) : (
           <>
             <RefreshCw size={18} color="#0F0F1E" />

@@ -22,6 +22,7 @@ import { useSoundAndHaptics } from "@/hooks/useSoundAndHaptics";
 import { ChessPieceComponent } from "@/components/ChessPieces";
 import { FontFamily, Colors } from "@/constants/theme";
 import type { BoardTheme, PieceStyle } from "@/types";
+import { ParallaxBackground } from "@/components/ParallaxBackground";
 
 // ============================================================================
 // Theme Configurations
@@ -76,6 +77,7 @@ export default function GameSettingsScreen() {
 
   return (
     <LinearGradient colors={["#05060f", "#0F0F1E"]} style={styles.container}>
+      <ParallaxBackground />
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity

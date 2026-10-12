@@ -5,11 +5,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  ActivityIndicator,
   SafeAreaView,
   ScrollView,
   Alert,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
@@ -213,7 +213,7 @@ export default function OnboardingScreen() {
           disabled={isSubmitting}
         >
           {isSubmitting ? (
-            <ActivityIndicator color="#1a1a2e" />
+            <LottieSpinner size={24} />
           ) : (
             <Text style={styles.submitButtonText}>Create Profile</Text>
           )}

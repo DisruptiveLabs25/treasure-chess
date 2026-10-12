@@ -16,11 +16,11 @@ import {
   ScrollView,
   TouchableOpacity,
   FlatList,
-  ActivityIndicator,
   TextInput,
   Alert,
   Modal,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -825,7 +825,7 @@ function ChallengeFormModal({ visible, challenge, onClose, onSave }: ChallengeFo
             disabled={isSaving}
           >
             {isSaving ? (
-              <ActivityIndicator color="#0F0F1E" />
+              <LottieSpinner size={24} />
             ) : (
               <Text style={styles.saveButtonText}>
                 {challenge ? "Save Changes" : "Create Challenge"}
@@ -1929,7 +1929,7 @@ function AdminHouseChallengesContent() {
           {/* Content */}
           {isLoading && challenges.length === 0 ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#FFD700" />
+              <LottieSpinner size={80} />
             </View>
           ) : selectedTab === "challenges" ? (
             <>

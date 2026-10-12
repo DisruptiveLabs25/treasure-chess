@@ -6,10 +6,10 @@ import {
   TextInput,
   TouchableOpacity,
   FlatList,
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -202,7 +202,7 @@ export default function TicketConversation() {
       <View style={styles.container}>
         <LinearGradient colors={["#0F0F1E", "#1A1A2E"]} style={styles.gradient}>
           <View style={styles.centerContainer}>
-            <ActivityIndicator size="large" color="#FFD700" />
+            <LottieSpinner size={80} />
           </View>
         </LinearGradient>
       </View>
@@ -279,7 +279,7 @@ export default function TicketConversation() {
                   disabled={!newMessage.trim() || isSending}
                 >
                   {isSending ? (
-                    <ActivityIndicator size="small" color="#0F0F1E" />
+                    <LottieSpinner size={24} />
                   ) : (
                     <Ionicons name="send" size={20} color="#0F0F1E" />
                   )}

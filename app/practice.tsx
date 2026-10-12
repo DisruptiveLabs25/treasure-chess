@@ -8,9 +8,9 @@ import {
   Dimensions,
   Image,
   ScrollView,
-  ActivityIndicator,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { Chess, Square, Move } from "chess.js";
 import { useRouter } from "expo-router";
 import { RotateCcw, X, Trophy, ChevronLeft, ChevronRight, MessageCircle, Share2, Bot } from "lucide-react-native";
@@ -684,7 +684,7 @@ export default function PracticeScreen() {
           <View style={styles.feedbackMessageBox}>
             {loadingFeedback ? (
               <View style={styles.feedbackLoadingContainer}>
-                <ActivityIndicator size="large" color="#FFD700" />
+                <LottieSpinner size={80} />
                 <Text style={styles.feedbackLoadingText}>Analyzing your move...</Text>
               </View>
             ) : (

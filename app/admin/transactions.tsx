@@ -11,9 +11,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  ActivityIndicator,
   RefreshControl,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -481,7 +481,7 @@ function AdminTransactionsContent() {
             ListEmptyComponent={
               <View style={styles.emptyContainer}>
                 {isLoading ? (
-                  <ActivityIndicator size="large" color="#FFD700" />
+                  <LottieSpinner size={80} />
                 ) : (
                   <>
                     <Ionicons name="receipt" size={48} color="#666" />
@@ -493,7 +493,7 @@ function AdminTransactionsContent() {
             ListFooterComponent={
               isLoading && transactions.length > 0 ? (
                 <View style={styles.loadMoreContainer}>
-                  <ActivityIndicator size="small" color="#FFD700" />
+                  <LottieSpinner size={24} />
                 </View>
               ) : null
             }

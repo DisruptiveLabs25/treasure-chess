@@ -27,9 +27,9 @@ import {
   TouchableOpacity,
   ScrollView,
   RefreshControl,
-  ActivityIndicator,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveTournaments } from "@/hooks/useTournament";
@@ -292,7 +292,7 @@ function TournamentsContent() {
               disabled={isLoading}
             >
               {isLoading ? (
-                <ActivityIndicator size="small" color="#FFD700" />
+                <LottieSpinner size={24} />
               ) : (
                 <RefreshCw size={20} color="#FFD700" />
               )}
@@ -398,7 +398,7 @@ function TournamentsContent() {
             {/* Loading State */}
             {isLoading && tournaments.length === 0 && (
               <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#FFD700" />
+                <LottieSpinner size={80} />
                 <Text style={styles.loadingText}>Loading tournaments...</Text>
               </View>
             )}

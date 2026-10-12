@@ -34,11 +34,11 @@ import {
   TouchableOpacity,
   ScrollView,
   RefreshControl,
-  ActivityIndicator,
   Alert,
   Share,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/hooks/useAuth";
 import { useTournament } from "@/hooks/useTournament";
@@ -346,7 +346,7 @@ function TournamentDetailContent() {
   if (isLoading && !tournament) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#FFD700" />
+        <LottieSpinner size={80} />
         <Text style={styles.loadingText}>Loading tournament...</Text>
       </View>
     );
@@ -503,7 +503,7 @@ function TournamentDetailContent() {
                     disabled={isRegistering}
                   >
                     {isRegistering ? (
-                      <ActivityIndicator size="small" color="#E05C5C" />
+                      <LottieSpinner size={24} />
                     ) : (
                       <Text style={styles.unregisterButtonText}>
                         Unregister
@@ -526,7 +526,7 @@ function TournamentDetailContent() {
                       style={styles.registerButtonGradient}
                     >
                       {isRegistering ? (
-                        <ActivityIndicator size="small" color="#0F0F1E" />
+                        <LottieSpinner size={24} />
                       ) : (
                         <Text style={styles.registerButtonText}>
                           {isFull ? "Tournament Full" : "Register Now"}

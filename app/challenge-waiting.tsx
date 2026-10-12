@@ -4,11 +4,11 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
   ScrollView,
   Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { Swords, Clock, X, Home } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { useApp } from "@/contexts/AppContext";
@@ -129,11 +129,7 @@ export default function ChallengeWaitingScreen() {
             </Text>
           </View>
           <Text style={styles.timerLabel}>Time Remaining</Text>
-          <ActivityIndicator
-            size="large"
-            color="#FFD700"
-            style={styles.spinner}
-          />
+          <LottieSpinner size={80} style={styles.spinner} />
         </View>
 
         <View style={styles.matchDetailsCard}>

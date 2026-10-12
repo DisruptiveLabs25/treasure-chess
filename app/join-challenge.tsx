@@ -17,12 +17,12 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Animated,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -371,7 +371,7 @@ export default function JoinChallengeScreen() {
               <View style={styles.statusContainer}>
                 {isSearching && (
                   <View style={styles.statusRow}>
-                    <ActivityIndicator color="#4CAF82" size="small" />
+                    <LottieSpinner size={24} />
                     <Text style={styles.statusText}>Searching...</Text>
                   </View>
                 )}
@@ -507,7 +507,7 @@ export default function JoinChallengeScreen() {
                     style={styles.joinButtonGradient}
                   >
                     {isProcessing ? (
-                      <ActivityIndicator color="#FFF" />
+                      <LottieSpinner size={24} />
                     ) : (
                       <>
                         <Play size={20} color="#FFF" />

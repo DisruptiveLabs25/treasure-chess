@@ -6,11 +6,11 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -139,7 +139,7 @@ export default function NewTicketScreen() {
                   end={{ x: 1, y: 0 }}
                 >
                   {isSubmitting ? (
-                    <ActivityIndicator size="small" color="#0F0F1E" />
+                    <LottieSpinner size={24} />
                   ) : (
                     <Ionicons name="send" size={20} color="#0F0F1E" />
                   )}

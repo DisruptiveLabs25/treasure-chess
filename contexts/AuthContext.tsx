@@ -36,6 +36,12 @@ import {
   validateNotTestAccount,
 } from "@/lib/security";
 import { cleanupProfileSync } from "@/lib/profileSync";
+import {
+  setPendingGoogleIdToken,
+  consumePendingGoogleIdToken,
+  getOrCreateSequenceWalletGoogle,
+  getOrCreateSequenceWalletEmail,
+} from "@/lib/sequence";
 import { useUserStore } from "@/stores/userStore";
 import type {
   AuthState,
@@ -381,6 +387,43 @@ export function AuthProvider({ children }: AuthProviderProps) {
         return;
       }
 
+      // Populate Sequence embedded wallet address if not yet set. Non-fatal throughout.
+      if (!profile.embedded_wallet_address && isSupabaseConfigured) {
+        try {
+          const { data: { session: currentSession } } = await supabase.auth.getSession();
+          if (currentSession) {
+            const provider = (currentSession.user.app_metadata?.provider as string) ?? 'email';
+            let walletAddress: string | null = null;
+
+            if (provider === 'google') {
+              // Consume the Google ID token captured in loginWithGoogle (if present).
+              // Falls through to email if absent (cold-start resume, token not available).
+              const idToken = consumePendingGoogleIdToken();
+              if (idToken) {
+                walletAddress = await getOrCreateSequenceWalletGoogle(idToken);
+              }
+              if (!walletAddress && currentSession.user.email) {
+                walletAddress = await getOrCreateSequenceWalletEmail(currentSession.user.email);
+              }
+            } else {
+              if (currentSession.user.email) {
+                walletAddress = await getOrCreateSequenceWalletEmail(currentSession.user.email);
+              }
+            }
+
+            if (walletAddress) {
+              await (supabase.from("profiles") as any)
+                .update({ embedded_wallet_address: walletAddress })
+                .eq("id", profile.id);
+              profile = { ...profile, embedded_wallet_address: walletAddress };
+              logger.debug("Auth", "Sequence wallet set", { walletAddress });
+            }
+          }
+        } catch (e) {
+          console.warn("[Auth] Sequence wallet creation skipped (non-fatal):", String(e));
+        }
+      }
+
       const authUser: AuthUser = {
         id: profile.id,
         authUserId,
@@ -677,6 +720,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         );
         const accessToken = params.get("access_token");
         const refreshToken = params.get("refresh_token");
+        // Capture Google OIDC ID token for Sequence wallet creation.
+        // Present in Supabase's implicit flow when Google returns id_token in the fragment.
+        setPendingGoogleIdToken(params.get("id_token"));
         logger.debug("Auth", "OAuth redirect parsed", { hasAccessToken: !!accessToken, hasRefreshToken: !!refreshToken });
         if (accessToken && refreshToken) {
           const { error: sessionError } = await supabase.auth.setSession({

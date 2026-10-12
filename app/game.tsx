@@ -9,10 +9,10 @@ import {
   ScrollView,
   Image,
   Animated,
-  ActivityIndicator,
   Share,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { BlurView } from "expo-blur";
 import { Chess, Square, Move } from "chess.js";
 import { useRouter, useLocalSearchParams } from "expo-router";
@@ -1174,7 +1174,7 @@ Be friendly and constructive. Keep it brief and conversational.`;
                 <View style={styles.speechBubbleArrow} />
                 {loadingFeedback ? (
                   <View style={styles.feedbackLoadingContainer}>
-                    <ActivityIndicator size="small" color="#FFD700" />
+                    <LottieSpinner size={24} />
                     <Text style={styles.feedbackLoadingText}>Analyzing move...</Text>
                   </View>
                 ) : (

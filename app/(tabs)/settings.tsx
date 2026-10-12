@@ -11,9 +11,9 @@ import {
   Modal,
   FlatList,
   Switch,
-  ActivityIndicator,
   RefreshControl,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   Camera,
@@ -40,6 +40,7 @@ import { useRouter } from "expo-router";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { useToast } from "@/components/ToastNotification";
 import { Colors, FontFamily, Spacing, BorderRadius, Shadows } from "@/constants/theme";
+import { ParallaxBackground } from "@/components/ParallaxBackground";
 
 import {
   usernameSchema,
@@ -628,6 +629,7 @@ export default function SettingsScreen() {
 
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
+      <ParallaxBackground />
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
@@ -806,7 +808,7 @@ export default function SettingsScreen() {
             />
             {isCheckingUsername && (
               <View style={styles.checkingRow}>
-                <ActivityIndicator size="small" color={Colors.primary} />
+                <LottieSpinner size={24} />
                 <Text style={styles.checkingText}>Checking availability…</Text>
               </View>
             )}
@@ -824,7 +826,7 @@ export default function SettingsScreen() {
               activeOpacity={0.8}
             >
               {isSaving ? (
-                <ActivityIndicator size="small" color={Colors.background} />
+                <LottieSpinner size={24} />
               ) : (
                 <Text style={styles.saveBtnText}>Save Changes</Text>
               )}

@@ -19,13 +19,13 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
   TextInput,
   KeyboardAvoidingView,
   Platform,
   Alert,
   Keyboard,
 } from "react-native";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
@@ -376,7 +376,7 @@ export default function LoginScreen() {
                         end={{ x: 1, y: 1 }}
                       >
                         {otpState === "verifying_code" ? (
-                          <ActivityIndicator color="#1a1a2e" />
+                          <LottieSpinner size={24} />
                         ) : (
                           <Text style={styles.primaryButtonText}>Verify Code</Text>
                         )}
@@ -438,7 +438,7 @@ export default function LoginScreen() {
                         end={{ x: 1, y: 1 }}
                       >
                         {otpState === "sending_code" ? (
-                          <ActivityIndicator color="#1a1a2e" />
+                          <LottieSpinner size={24} />
                         ) : (
                           <Text style={styles.primaryButtonText}>Continue with Email</Text>
                         )}

@@ -21,6 +21,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
+import { LottieSpinner } from "@/components/LottieSpinner";
 import { Chess, Square, Move } from "chess.js";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Clock, Trophy, X, Crown, ArrowLeft } from "lucide-react-native";
@@ -809,7 +810,7 @@ export default function HouseChallengeGameScreen() {
       <LinearGradient colors={["#0F0F1E", "#1A1A2E"]} style={styles.container}>
         <SafeAreaView style={styles.safeArea} edges={["top"]}>
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#FFD700" />
+            <LottieSpinner size={80} />
             <Text style={styles.loadingText}>Loading challenge...</Text>
           </View>
         </SafeAreaView>
@@ -911,7 +912,7 @@ export default function HouseChallengeGameScreen() {
             >
               {isStarting ? (
                 <>
-                  <ActivityIndicator color="#0F0F1E" style={{ marginRight: 8 }} />
+                  <LottieSpinner size={24} style={{ marginRight: 8 }} />
                   <Text style={styles.startButtonText}>Starting...</Text>
                 </>
               ) : !needsPayment ? (
@@ -1084,7 +1085,7 @@ export default function HouseChallengeGameScreen() {
           <Text style={[styles.timerText, !isPlayerTurn && styles.timerTextActive]}>
             AI: {formatTime(opponentTime)}
           </Text>
-          {isAiThinking && <ActivityIndicator size="small" color="#FFD700" />}
+          {isAiThinking && <LottieSpinner size={24} />}
         </View>
 
         {/* Board */}
